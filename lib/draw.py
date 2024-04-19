@@ -1,4 +1,20 @@
 from PIL import Image, ImageDraw
+# 2024-04-18 19:46 IJMC: Added sortxyxy() to ensure correct ordering
+#                        for draw.rectangle.
+
+def sortxyxy(fourlist):
+    """Sort [x0,y0,x1,y1] to ensure that
+        x0 < x1 and y0 < y1.
+    """
+    # 2024-04-18 19:29 IJMC: Created 
+    x0,y0,x1,y1 = fourlist
+    xvals = [x0,x1]
+    yvals = [y0,y1]
+    xvals.sort()
+    yvals.sort()
+    x0,x1 = xvals
+    y0,y1 = yvals
+    return([x0,y0,x1,y1])
 
 def draw_triangles(img, top, right, bottom, left):
     width = img.width
@@ -81,6 +97,8 @@ def draw_black_lines(img):
     return img
 
 def draw_shapes(img, color):
+    # 2024-04-18 19:35 IJMC: Added sortxyxy calls to ensure correct coordinate ordering.
+
     width = img.width
     height = img.height
     draw = ImageDraw.Draw(img)
@@ -92,8 +110,12 @@ def draw_shapes(img, color):
     #draw the 4 boxes around the image
     draw.rectangle((width / 8, 2, width / 4, height * (1/8)), fill = color)
     draw.rectangle((width / 8, height * (7/8), width / 4, height - 4), fill = color)
-    draw.rectangle((width * (7/8), 2, width * (3/4), height * (1/8)), fill = color)
-    draw.rectangle((width * (7/8), height * (7/8), width * (3/4), height - 4), fill = color)
+    ###draw.rectangle((width * (7/8), 2, width * (3/4), height * (1/8)), fill = color)
+    xy = sortxyxy((width * (7/8), 2, width * (3/4), height * (1/8)))
+    draw.rectangle(xy, fill=color)
+    ###draw.rectangle((width * (7/8), height * (7/8), width * (3/4), height - 4), fill = color)
+    xy = sortxyxy((width * (7/8), height * (7/8), width * (3/4), height - 4))
+    draw.rectangle(xy, fill=color)
 
     #draw diagonal lines towards center
     draw.line((2, 2 , width / 4, height / 4), fill = color, width = 3)
